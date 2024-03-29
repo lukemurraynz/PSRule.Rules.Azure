@@ -4,15 +4,17 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.4.1008.15138",
-      "templateHash": "7172118729176493931"
+      "version": "0.25.53.49325",
+      "templateHash": "18407530808560387725"
     }
   },
   "parameters": {
-    "registryName": {
+    "name": {
       "type": "string",
+      "minLength": 5,
+      "maxLength": 50,
       "metadata": {
-        "description": "The name of the Container Registry."
+        "description": "The name of the resource."
       }
     },
     "location": {
@@ -23,12 +25,11 @@
       }
     }
   },
-  "functions": [],
   "resources": [
     {
       "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2021-06-01-preview",
-      "name": "[parameters('registryName')]",
+      "apiVersion": "2023-11-01-preview",
+      "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "Premium"
@@ -38,6 +39,7 @@
       },
       "properties": {
         "adminUserEnabled": false,
+        "anonymousPullEnabled": false,
         "policies": {
           "quarantinePolicy": {
             "status": "enabled"
@@ -47,8 +49,12 @@
             "type": "Notary"
           },
           "retentionPolicy": {
-            "status": "enabled",
-            "days": 30
+            "days": 30,
+            "status": "enabled"
+          },
+          "softDeletePolicy": {
+            "retentionDays": 90,
+            "status": "enabled"
           }
         }
       }

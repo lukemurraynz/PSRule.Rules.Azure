@@ -3,15 +3,17 @@
 
 // Bicep documentation examples
 
-@description('The name of the Container Registry.')
-param registryName string
+@minLength(5)
+@maxLength(50)
+@sys.description('The name of the resource.')
+param name string
 
-@description('The location resources will be deployed.')
+@sys.description('The location resources will be deployed.')
 param location string = resourceGroup().location
 
-// An example container registry
-resource acr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
-  name: registryName
+// An example container registry deployed with Premium SKU.
+resource registry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
+  name: name
   location: location
   sku: {
     name: 'Premium'
@@ -21,6 +23,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   }
   properties: {
     adminUserEnabled: false
+    anonymousPullEnabled: false
     policies: {
       quarantinePolicy: {
         status: 'enabled'
@@ -30,8 +33,12 @@ resource acr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
         type: 'Notary'
       }
       retentionPolicy: {
-        status: 'enabled'
         days: 30
+        status: 'enabled'
+      }
+      softDeletePolicy: {
+        retentionDays: 90
+        status: 'enabled'
       }
     }
   }
